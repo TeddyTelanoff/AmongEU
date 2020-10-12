@@ -1,0 +1,13 @@
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\bin\Debug\netcoreapp3.1\DeticatedServer.exe
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\bin\Debug\netcoreapp3.1\DeticatedServer.deps.json
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\bin\Debug\netcoreapp3.1\DeticatedServer.runtimeconfig.json
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\bin\Debug\netcoreapp3.1\DeticatedServer.runtimeconfig.dev.json
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\bin\Debug\netcoreapp3.1\DeticatedServer.dll
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\bin\Debug\netcoreapp3.1\DeticatedServer.pdb
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\obj\Debug\netcoreapp3.1\DeticatedServer.csprojAssemblyReference.cache
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\obj\Debug\netcoreapp3.1\DeticatedServer.AssemblyInfoInputs.cache
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\obj\Debug\netcoreapp3.1\DeticatedServer.AssemblyInfo.cs
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\obj\Debug\netcoreapp3.1\DeticatedServer.csproj.CoreCompileInputs.cache
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\obj\Debug\netcoreapp3.1\DeticatedServer.dll
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\obj\Debug\netcoreapp3.1\DeticatedServer.pdb
+D:\Projects\Unity\AnomgEU\DeticatedServer\C#\DeticatedServer\obj\Debug\netcoreapp3.1\DeticatedServer.genruntimeconfig.cache

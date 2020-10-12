@@ -52,7 +52,7 @@ public class Server
     {
         for (int i = 1; i <= MaxPlayers; i++)
             Clients.Add(i, new ServerClient(i));
-        Console.WriteLine("Initialized Server Clients.");
+        Debug.Log("Initialized Server Clients.");
     }
 
     private static void InitializeServerHandles()
@@ -61,6 +61,6 @@ public class Server
         {
             { (int)ClientPackets.WelcomeReceived, ServerHandle.HandleWelcomeReceived }
         };
-        Console.WriteLine("Initialized packets.");
+        Debug.Log("Initialized packets.");
     }
 }
