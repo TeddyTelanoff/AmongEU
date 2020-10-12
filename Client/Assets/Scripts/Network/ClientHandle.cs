@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Net;
+using UnityEngine;
 
 public class ClientHandle
 {
@@ -11,5 +12,15 @@ public class ClientHandle
         Client.Instance.Id = id;
 
         ClientSend.SendWelcomeReceived();
+        Client.Instance.udp.Connect(((IPEndPoint)Client.Instance.tcp.socket.Client.LocalEndPoint).Port);
+    }
+
+    public static void HandleUDPTest(Packet packet)
+    {
+        string msg = packet.ReadString();
+
+        Debug.Log(msg);
+
+        ClientSend.SendUDPTestAccepted();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Sockets;
 
 namespace DeticatedServer
@@ -9,11 +10,13 @@ namespace DeticatedServer
 
         public int Id;
         public TCP tcp;
+        public UDP udp;
 
         public ServerClient(int id)
         {
             Id = id;
             tcp = new TCP(Id);
+            udp = new UDP(Id);
         }
 
         public class TCP
@@ -44,7 +47,7 @@ namespace DeticatedServer
                 stream.BeginRead(receiveBuffer, 0, DataBufferSize, ReceiveCallback, null);
 
                 Console.WriteLine($"Client {id} Connected to the Server.");
-                ServerSend.SendWelcome(id, "Welcome to the Server!", $"{id} Joined the Server!");
+                ServerSend.SendWelcome(id, "Welcome to the Server!");
             }
 
             public void SendPacket(Packet packet)
@@ -129,6 +132,44 @@ namespace DeticatedServer
                 }
 
                 return packetLength <= 1;
+            }
+        }
+
+        public class UDP
+        {
+            public IPEndPoint endPoint;
+
+            private readonly int id;
+
+            public UDP(int id)
+            {
+                this.id = id;
+            }
+
+            public void Connect(IPEndPoint endPoint)
+            {
+                this.endPoint = endPoint;
+                ServerSend.SendUDPTest(id);
+            }
+
+            public void SendPacket(Packet packet)
+            {
+                Server.SendUDPPacket(endPoint, packet);
+            }
+
+            public void HandleBuffer(Packet packet)
+            {
+                int packetLength = packet.ReadInt();
+                byte[] packetBytes = packet.ReadBytes(packetLength);
+
+                ThreadManager.ExecuteOnMainThread(() =>
+                {
+                    using (Packet packet = new Packet(packetBytes))
+                    {
+                        int packetID = packet.ReadInt();
+                        Server.packetHandlers[packetID](id, packet);
+                    }
+                });
             }
         }
     }

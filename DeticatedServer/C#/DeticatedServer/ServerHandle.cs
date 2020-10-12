@@ -16,5 +16,12 @@ namespace DeticatedServer
             else
                 Console.WriteLine($"Player \"{username}\" (ID: {clientID}) has assumed the wrong client ID ({packetClientID})!");
         }
+
+        public static void HandleUDPTestAccepted(int clientID, Packet packet)
+        {
+            string msg = packet.ReadString();
+
+            Console.WriteLine(msg);
+        }
     }
 }

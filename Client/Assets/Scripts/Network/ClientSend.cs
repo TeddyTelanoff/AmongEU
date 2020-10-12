@@ -8,6 +8,12 @@ public class ClientSend
         Client.Instance.tcp.SendPacket(packet);
     }
 
+    public static void SendUDPPacket(Packet packet)
+    {
+        packet.WriteLength();
+        Client.Instance.udp.SendPacket(packet);
+    }
+
     #region Packets
     public static void SendWelcomeReceived()
     {
@@ -17,6 +23,16 @@ public class ClientSend
             packet.Write(UIManager.Instance.usernameField.text);
 
             SendTCPPacket(packet);
+        }
+    }
+
+    public static void SendUDPTestAccepted()
+    {
+        using (Packet packet = new Packet((int)ClientPackets.WelcomeReceived))
+        {
+            packet.Write("UDP Test Accepted!");
+
+            SendUDPPacket(packet);
         }
     }
     #endregion

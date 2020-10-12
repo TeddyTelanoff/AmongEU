@@ -6,6 +6,7 @@ namespace DeticatedServer
 {
     class ServerSend
     {
+        #region TCP
         public static void SendTCPData(int clientID, Packet packet)
         {
             packet.WriteLength();
@@ -45,8 +46,52 @@ namespace DeticatedServer
                     Server.Clients[i].tcp.SendPacket(packet);
             }
         }
+        #endregion
 
-        public static void SendWelcome(int clientID, string msg, string amsg)
+        #region UDP
+        public static void SendUDPData(int clientID, Packet packet)
+        {
+            packet.WriteLength();
+            Server.Clients[clientID].udp.SendPacket(packet);
+        }
+
+        public static void SendUDPDataToAll(Packet packet)
+        {
+            packet.WriteLength();
+            for (int i = 1; i < Server.MaxPlayers; i++)
+            {
+                Server.Clients[i].udp.SendPacket(packet);
+            }
+        }
+
+        public static void SendUDPDataToAll(int except, Packet packet)
+        {
+            packet.WriteLength();
+            for (int i = 1; i < Server.MaxPlayers; i++)
+            {
+                if (i != except)
+                    Server.Clients[i].udp.SendPacket(packet);
+            }
+        }
+
+        public static void SendUDPDataToAll(int[] except, Packet packet)
+        {
+            packet.WriteLength();
+            bool send;
+            for (int i = 1; i < Server.MaxPlayers; i++)
+            {
+                send = true;
+                foreach (int cID in except)
+                    if (i == cID)
+                        send = false;
+                if (send)
+                    Server.Clients[i].udp.SendPacket(packet);
+            }
+        }
+        #endregion
+
+        #region Packets
+        public static void SendWelcome(int clientID, string msg)
         {
             Console.WriteLine("Sending Welcome...");
             using (Packet packet = new Packet((int)ServerPackets.Welcome))
@@ -57,5 +102,17 @@ namespace DeticatedServer
                 SendTCPData(clientID, packet);
             }
         }
+
+        public static void SendUDPTest(int clientID)
+        {
+            Console.WriteLine("Sending Welcome...");
+            using (Packet packet = new Packet((int)ServerPackets.Welcome))
+            {
+                packet.Write("A test for UDP");
+
+                SendUDPData(clientID, packet);
+            }
+        }
+        #endregion
     }
 }

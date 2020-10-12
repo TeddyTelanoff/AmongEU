@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 
@@ -14,6 +15,7 @@ public class Client : MonoBehaviour
 
     public int Id { get; set; }
     public TCP tcp;
+    public UDP udp;
 
     private delegate void PacketHandler(Packet packet);
     private static Dictionary<int, PacketHandler> packetHandlers;
@@ -34,6 +36,7 @@ public class Client : MonoBehaviour
     private void Start()
     {
         tcp = new TCP();
+        udp = new UDP();
     }
 
     public void ConnectToServer()
@@ -42,7 +45,7 @@ public class Client : MonoBehaviour
         tcp.Connect();
     }
 
-    public struct TCP
+    public class TCP
     {
         public TcpClient socket;
 
@@ -167,11 +170,89 @@ public class Client : MonoBehaviour
         }
     }
 
+    public class UDP
+    {
+        public UdpClient socket;
+        public IPEndPoint endPoint;
+
+        public UDP()
+        {
+            endPoint = new IPEndPoint(IPAddress.Parse(Instance.ip), Instance.port);
+        }
+
+        public void Connect(int localPort)
+        {
+            socket = new UdpClient(localPort);
+
+            socket.Connect(endPoint);
+            socket.BeginReceive(ReceiveCallback, null);
+
+            using (Packet packet = new Packet())
+            {
+                SendPacket(packet);
+            }
+        }
+
+        public void SendPacket(Packet packet)
+        {
+            try
+            {
+                packet.InsertInt(Instance.Id);
+
+                if (socket != null)
+                    socket.BeginSend(packet.ToArray(), packet.Length(), null, null);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error Sending Data via UDP: {e}");
+            }
+        }
+
+        private void ReceiveCallback(IAsyncResult result)
+        {
+            try
+            {
+                byte[] buffer = socket.EndReceive(result, ref endPoint);
+                socket.BeginReceive(ReceiveCallback, null);
+
+                if (buffer.Length < sizeof(int))
+                {
+                    return;
+                }
+
+                HandleBuffer(buffer);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error Receiving Data via UDP: {e}");
+            }
+        }
+
+        private void HandleBuffer(byte[] buffer)
+        {
+            using (Packet packet = new Packet(buffer))
+            {
+                int packetLength = packet.ReadInt();
+                buffer = packet.ReadBytes(packetLength);
+            }
+
+            ThreadManager.ExecuteOnMainThread(() =>
+            {
+                using (Packet packet = new Packet(buffer))
+                {
+                    int packetID = packet.ReadInt();
+                    packetHandlers[packetID](packet);
+                }
+            });
+        }
+    }
+
     private void InitializeClientHandles()
     {
         packetHandlers = new Dictionary<int, PacketHandler>
         {
-            { (int)ServerPackets.Welcome, ClientHandle.HandleWelcome }
+            { (int)ServerPackets.Welcome, ClientHandle.HandleWelcome },
+            { (int)ServerPackets.UDPTest, ClientHandle.HandleUDPTest }
         };
 
         Debug.Log("Initialized Handles.");
