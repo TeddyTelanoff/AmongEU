@@ -28,6 +28,8 @@ namespace DeticatedServer
                         }*/
 
                         ThreadManager.UpdateMain();
+                        foreach (ServerClient client in Server.Clients.Values)
+                            client.Update();
 
                         _nextLoop = _nextLoop.AddMilliseconds(Constants.MS_PER_TICK); // Calculate at what point in time the next tick should be executed
 

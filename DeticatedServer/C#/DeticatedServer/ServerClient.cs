@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using DeticatedServer.Game;
 
 namespace DeticatedServer
 {
@@ -12,11 +13,17 @@ namespace DeticatedServer
         public TCP tcp;
         public UDP udp;
 
+        public PlayerController playerController;
+        public string username;
+
         public ServerClient(int id)
         {
             Id = id;
             tcp = new TCP(Id);
             udp = new UDP(Id);
+
+            playerController = new PlayerController();
+            username = "";
         }
 
         public class TCP
@@ -45,6 +52,8 @@ namespace DeticatedServer
                 receiveBuffer = new byte[DataBufferSize];
 
                 stream.BeginRead(receiveBuffer, 0, DataBufferSize, ReceiveCallback, null);
+
+                Server.Clients[id].SetPlayerController(new PlayerController());
 
                 Console.WriteLine($"Client {id} Connected to the Server.");
                 ServerSend.SendWelcome(id, "Welcome to the Server!");
@@ -188,12 +197,30 @@ namespace DeticatedServer
             }
         }
 
+        public void Update()
+        {
+            if (playerController != null)
+                playerController.Update();
+        }
+
         public void Disconnect()
         {
             Console.WriteLine($"{tcp.socket.Client.RemoteEndPoint} has Disconnected.");
 
             tcp.Disconnect();
             udp.Disconnect();
+
+            playerController = null;
+        }
+
+        public void SetUsername(string username)
+        {
+            this.username = username;
+        }
+
+        private void SetPlayerController(PlayerController playerController)
+        {
+            this.playerController = playerController;
         }
     }
 }
