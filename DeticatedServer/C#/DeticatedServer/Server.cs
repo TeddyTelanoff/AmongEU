@@ -112,7 +112,8 @@ namespace DeticatedServer
             packetHandlers = new Dictionary<int, PacketHandler>
         {
             { (int)ClientPackets.WelcomeReceived, ServerHandle.HandleWelcomeReceived },
-            { (int)ClientPackets.UDPTestAccepted, ServerHandle.HandleUDPTestAccepted }
+            { (int)ClientPackets.UDPTestAccepted, ServerHandle.HandleUDPTestAccepted },
+            { (int)ClientPackets.Input, ServerHandle.HandleInput }
         };
             Console.WriteLine("Initialized packets.");
         }

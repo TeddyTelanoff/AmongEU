@@ -1,52 +1,58 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
-	public Transform cameraTransform;
+    public Dictionary<int, int> input;
 
-	public float speed;
-	public float rotateSpeed;
-	public float rotateLerp;
+    public PlayerController()
+    {
+        input = new Dictionary<int, int>();
+        for (int i = 0; i < (int)PlayerInput.Last; i++)
+            input.Add(i, (int)ButtonMode.None);
+    }
 
-	private Vector2 rotation;
+    public void FixedUpdate()
+    {
+        input[(int)PlayerInput.Left] = Input.GetKeyDown(KeyCode.A) ? (int)ButtonMode.Pressed :
+            Input.GetKey(KeyCode.A) ? (int)ButtonMode.Held :
+            Input.GetKeyUp(KeyCode.A) ? (int)ButtonMode.Release :
+            (int)ButtonMode.None;
+        input[(int)PlayerInput.Right] = Input.GetKeyDown(KeyCode.D) ? (int)ButtonMode.Pressed :
+            Input.GetKey(KeyCode.D) ? (int)ButtonMode.Held :
+            Input.GetKeyUp(KeyCode.D) ? (int)ButtonMode.Release :
+            (int)ButtonMode.None;
+        input[(int)PlayerInput.Forward] = Input.GetKeyDown(KeyCode.W) ? (int)ButtonMode.Pressed :
+            Input.GetKey(KeyCode.W) ? (int)ButtonMode.Held :
+            Input.GetKeyUp(KeyCode.W) ? (int)ButtonMode.Release :
+            (int)ButtonMode.None;
+        input[(int)PlayerInput.Back] = Input.GetKeyDown(KeyCode.S) ? (int)ButtonMode.Pressed :
+            Input.GetKey(KeyCode.S) ? (int)ButtonMode.Held :
+            Input.GetKeyUp(KeyCode.S) ? (int)ButtonMode.Release :
+            (int)ButtonMode.None;
 
-	private void FixedUpdate()
-	{
-		// Turning
-#if UNITY_EDITOR
-		if (Input.GetKeyDown(KeyCode.LeftShift))
-		{
-			Cursor.lockState = CursorLockMode.Locked;
-			Cursor.visible = false;
-		}
-		if (Input.GetKeyUp(KeyCode.LeftShift))
-		{
-			Cursor.lockState = CursorLockMode.None;
-			Cursor.visible = true;
-		}
-		if (Input.GetKey(KeyCode.LeftShift))
-		{
-#endif
-			rotation.x -= Input.GetAxis("Mouse Y") * rotateSpeed;
-			rotation.y += Input.GetAxis("Mouse X") * rotateSpeed;
+        ClientSend.SendInput(input);
+    }
+}
 
-			rotation.x = Mathf.Clamp(rotation.x, -90, 90);
+enum ButtonMode
+{
+    None,
+    Pressed,
+    Held,
+    Release,
 
-			if (rotation.y > 360)
-				rotation.y = 0;
-			if (rotation.y < 0)
-				rotation.y = 360;
-#if UNITY_EDITOR
-		}
-#endif
+    Last = Release
+}
 
-		cameraTransform.localRotation = Quaternion.Slerp(cameraTransform.localRotation, Quaternion.Euler(new Vector3 { x = rotation.x }), rotateLerp);
-		transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(new Vector3 { y = rotation.y }), rotateLerp);
+enum PlayerInput
+{
+    Left,
+    Right,
+    Forward,
+    Back,
 
-		// Movement
-		float horizontal = Input.GetAxis("Horizontal");
-		float vertical = Input.GetAxis("Vertical");
-
-		transform.position += transform.forward * vertical * speed + transform.right * horizontal * speed;
-	}
+    Last = Back
 }

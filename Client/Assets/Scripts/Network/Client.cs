@@ -17,6 +17,8 @@ public class Client : MonoBehaviour
     public TCP tcp;
     public UDP udp;
 
+    public PlayerController playerController;
+
     private bool isConnected;
     private delegate void PacketHandler(Packet packet);
     private static Dictionary<int, PacketHandler> packetHandlers;
@@ -285,6 +287,8 @@ public class Client : MonoBehaviour
             udp.socket.Close();
 
             Debug.Log("Disconnected.");
+
+            Application.Quit();
         }
     }
 
@@ -293,7 +297,9 @@ public class Client : MonoBehaviour
         packetHandlers = new Dictionary<int, PacketHandler>
         {
             { (int)ServerPackets.Welcome, ClientHandle.HandleWelcome },
-            { (int)ServerPackets.UDPTest, ClientHandle.HandleUDPTest }
+            { (int)ServerPackets.UDPTest, ClientHandle.HandleUDPTest },
+            { (int)ServerPackets.Position, ClientHandle.HandlePosition },
+            { (int)ServerPackets.Disconnect, ClientHandle.HandlePosition }
         };
 
         Debug.Log("Initialized Handles.");

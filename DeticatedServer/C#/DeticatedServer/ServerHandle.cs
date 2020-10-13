@@ -29,22 +29,27 @@ namespace DeticatedServer
 
         public static void HandleInput(int clientID, Packet packet)
         {
-            int key = packet.ReadInt();
-            int mode = packet.ReadInt();
-
-            if (key < 0 || key > (int)PlayerInput.Last)
+            int maxKeys = packet.ReadInt();
+            for (int i = 0; i < maxKeys; i++)
             {
-                Console.WriteLine($"Player \"{Server.Clients[clientID].username}\" (ID: {clientID}) Has Invalid Input Key: {key}");
-                return;
-            }
+                int key = packet.ReadInt();
+                int mode = packet.ReadInt();
 
-            if (mode < 0 || mode > (int)ButtonMode.Last)
-            {
-                Console.WriteLine($"Player \"{Server.Clients[clientID].username}\" (ID: {clientID}) Has Invalid Input Mode: {mode}");
-                return;
-            }
+                if (key < 0 || key > (int)PlayerInput.Last)
+                {
+                    Console.WriteLine($"Player \"{Server.Clients[clientID].username}\" (ID: {clientID}) Has Invalid Input Key: {key}");
+                    return;
+                }
 
-            Server.Clients[clientID].playerController.Input[key] = mode;
+                if (mode < 0 || mode > (int)ButtonMode.Last)
+                {
+                    Console.WriteLine($"Player \"{Server.Clients[clientID].username}\" (ID: {clientID}) Has Invalid Input Mode: {mode}");
+                    return;
+                }
+
+                if (Server.Clients[clientID].playerController != null)
+                    Server.Clients[clientID].playerController.Input[key] = mode;
+            }
         }
     }
 }

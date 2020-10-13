@@ -9,7 +9,9 @@ using System.Text;
 public enum ServerPackets
 {
     Welcome,
-    UDPTest
+    UDPTest,
+    Position,
+    Disconnect
 }
 
 /// <summary>Sent from client to server.</summary>

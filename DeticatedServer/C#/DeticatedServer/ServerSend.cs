@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DeticatedServer
 {
@@ -105,12 +103,33 @@ namespace DeticatedServer
 
         public static void SendUDPTest(int clientID)
         {
-            Console.WriteLine("Sending Welcome...");
+            Console.WriteLine("Sending UDP Test...");
             using (Packet packet = new Packet((int)ServerPackets.UDPTest))
             {
                 packet.Write("A test for UDP");
 
                 SendUDPData(clientID, packet);
+            }
+        }
+
+        public static void SendPosition(int clientID)
+        {
+            using (Packet packet = new Packet((int)ServerPackets.Position))
+            {
+                packet.Write(clientID);
+                packet.Write(Server.Clients[clientID].playerController.position);
+
+                SendUDPDataToAll(packet);
+            }
+        }
+
+        public static void SendDisconnect(int clientID)
+        {
+            using (Packet packet = new Packet((int)ServerPackets.Disconnect))
+            {
+                packet.Write(clientID);
+
+                SendUDPDataToAll(packet);
             }
         }
         #endregion

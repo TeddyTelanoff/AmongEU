@@ -187,7 +187,8 @@ GameObject:
   - component: {fileID: 4773254929621560218}
   - component: {fileID: 4773254929621560219}
   - component: {fileID: 4773254929621560220}
-  - component: {fileID: 4773254929621560221}
+  - component: {fileID: 4013439270694528312}
+  - component: {fileID: 4189670001733179882}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -240,7 +241,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &4773254929621560221
+--- !u!114 &4013439270694528312
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -249,13 +250,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 4773254929621560217}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 274e9a28613df6b4a90423e2a410ba7c, type: 3}
+  m_Script: {fileID: 11500000, guid: 19f1315cf2d750045b94f79e7ae04165, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraTransform: {fileID: 4773254930773099481}
-  speed: 0.25
-  rotateSpeed: 5
-  rotateLerp: 0.25
+--- !u!114 &4189670001733179882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4773254929621560217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d20d132fdd6eb74c941b4461554d2a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerController: {fileID: 0}
+  Id: 0
 --- !u!1 &4773254930773099480
 GameObject:
   m_ObjectHideFlags: 0
@@ -271,7 +282,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4773254930773099481
 Transform:
   m_ObjectHideFlags: 0

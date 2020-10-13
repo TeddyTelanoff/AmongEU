@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using DeticatedServer.Game;
 
 namespace DeticatedServer
 {
@@ -22,14 +23,11 @@ namespace DeticatedServer
                     while (_nextLoop < DateTime.Now)
                     {
                         // If the time for the next loop is in the past, aka it's time to execute another tick
-                        /*foreach (ServerClient _client in Server.Clients.Values)
-                        {
-                            
-                        }*/
 
-                        ThreadManager.UpdateMain();
                         foreach (ServerClient client in Server.Clients.Values)
                             client.Update();
+                        PolygonCollider.CheckCollisions();
+                        ThreadManager.UpdateMain();
 
                         _nextLoop = _nextLoop.AddMilliseconds(Constants.MS_PER_TICK); // Calculate at what point in time the next tick should be executed
 
