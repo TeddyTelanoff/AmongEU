@@ -106,7 +106,7 @@ namespace DeticatedServer
         public static void SendUDPTest(int clientID)
         {
             Console.WriteLine("Sending Welcome...");
-            using (Packet packet = new Packet((int)ServerPackets.Welcome))
+            using (Packet packet = new Packet((int)ServerPackets.UDPTest))
             {
                 packet.Write("A test for UDP");
 

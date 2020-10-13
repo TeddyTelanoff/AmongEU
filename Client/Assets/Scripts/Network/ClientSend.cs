@@ -28,7 +28,7 @@ public class ClientSend
 
     public static void SendUDPTestAccepted()
     {
-        using (Packet packet = new Packet((int)ClientPackets.WelcomeReceived))
+        using (Packet packet = new Packet((int)ClientPackets.UDPTestAccepted))
         {
             packet.Write("UDP Test Accepted!");
 

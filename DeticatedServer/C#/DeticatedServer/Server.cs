@@ -68,7 +68,7 @@ namespace DeticatedServer
                 {
                     int clientID = packet.ReadInt();
 
-                    if (clientID < 0 || clientID > MaxPlayers)
+                    if (clientID <= 0 || clientID > MaxPlayers)
                         return;
 
                     if (Clients[clientID].udp.endPoint == null)

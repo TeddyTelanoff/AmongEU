@@ -17,6 +17,7 @@ public class Client : MonoBehaviour
     public TCP tcp;
     public UDP udp;
 
+    private bool isConnected;
     private delegate void PacketHandler(Packet packet);
     private static Dictionary<int, PacketHandler> packetHandlers;
 
@@ -39,9 +40,16 @@ public class Client : MonoBehaviour
         udp = new UDP();
     }
 
+    private void OnApplicationQuit()
+    {
+        Disconnect();
+    }
+
     public void ConnectToServer()
     {
         InitializeClientHandles();
+
+        isConnected = true;
         tcp.Connect();
     }
 
@@ -63,6 +71,16 @@ public class Client : MonoBehaviour
 
             receiveBuffer = new byte[DataBufferSize];
             socket.BeginConnect(Instance.ip, Instance.port, ConnectCallback, socket);
+        }
+
+        public void Disconnect()
+        {
+            Instance.Disconnect();
+
+            stream = null;
+            receiveBuffer = null;
+            receivedPacket = null;
+            socket = null;
         }
 
         public void ConnectCallback(IAsyncResult result)
@@ -108,7 +126,7 @@ public class Client : MonoBehaviour
                 int byteLength = stream.EndRead(result);
                 if (byteLength <= 0)
                 {
-                    // TODO: Disconnect
+                    Instance.Disconnect();
 
                     return;
                 }
@@ -124,7 +142,8 @@ public class Client : MonoBehaviour
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error Receiving TCP Data: {e}; Disconnecting...");
+                Debug.LogWarning($"Error Receiving TCP Data: {e}; Disconnecting...");
+                Disconnect();
             }
         }
 
@@ -193,6 +212,14 @@ public class Client : MonoBehaviour
             }
         }
 
+        public void Disconnect()
+        {
+            Instance.Disconnect();
+
+            endPoint = null;
+            socket = null;
+        }
+
         public void SendPacket(Packet packet)
         {
             try
@@ -217,6 +244,7 @@ public class Client : MonoBehaviour
 
                 if (buffer.Length < sizeof(int))
                 {
+                    Instance.Disconnect();
                     return;
                 }
 
@@ -224,7 +252,8 @@ public class Client : MonoBehaviour
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error Receiving Data via UDP: {e}");
+                Debug.LogWarning($"Error Receiving Data via UDP: {e}; Disconecting...");
+                Disconnect();
             }
         }
 
@@ -244,6 +273,18 @@ public class Client : MonoBehaviour
                     packetHandlers[packetID](packet);
                 }
             });
+        }
+    }
+
+    public void Disconnect()
+    {
+        if (isConnected)
+        {
+            isConnected = false;
+            tcp.socket.Close();
+            udp.socket.Close();
+
+            Debug.Log("Disconnected.");
         }
     }
 

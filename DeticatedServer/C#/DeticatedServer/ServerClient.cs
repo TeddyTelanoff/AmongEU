@@ -50,6 +50,15 @@ namespace DeticatedServer
                 ServerSend.SendWelcome(id, "Welcome to the Server!");
             }
 
+            public void Disconnect()
+            {
+                socket.Close();
+                stream = null;
+                receiveBuffer = null;
+                receivedPacket = null;
+                socket = null;
+            }
+
             public void SendPacket(Packet packet)
             {
                 try
@@ -75,7 +84,7 @@ namespace DeticatedServer
                     int byteLength = stream.EndRead(result);
                     if (byteLength < 1)
                     {
-                        // TODO: Disconnect
+                        Server.Clients[id].Disconnect();
 
                         return;
                     }
@@ -89,6 +98,7 @@ namespace DeticatedServer
                 catch (Exception e)
                 {
                     Console.WriteLine($"Error Receiving TCP Data: {e}");
+                    Server.Clients[id].Disconnect();
                 }
             }
 
@@ -152,6 +162,11 @@ namespace DeticatedServer
                 ServerSend.SendUDPTest(id);
             }
 
+            public void Disconnect()
+            {
+                endPoint = null;
+            }
+
             public void SendPacket(Packet packet)
             {
                 Server.SendUDPPacket(endPoint, packet);
@@ -171,6 +186,14 @@ namespace DeticatedServer
                     }
                 });
             }
+        }
+
+        public void Disconnect()
+        {
+            Console.WriteLine($"{tcp.socket.Client.RemoteEndPoint} has Disconnected.");
+
+            tcp.Disconnect();
+            udp.Disconnect();
         }
     }
 }
