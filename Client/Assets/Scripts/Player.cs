@@ -10,13 +10,6 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        GameManager.Instance.Players.Add(this);
-
         playerController = GetComponent<PlayerController>();
-    }
-
-    private void OnDestroy()
-    {
-        GameManager.Instance.Players.Remove(this);
     }
 }

@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     public Dictionary<int, int> input;
 
-    public PlayerController()
+    private void Awake()
     {
         input = new Dictionary<int, int>();
         for (int i = 0; i < (int)PlayerInput.Last; i++)

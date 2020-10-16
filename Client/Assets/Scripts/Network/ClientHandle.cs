@@ -11,6 +11,9 @@ public class ClientHandle
         Debug.Log(msg);
         Client.Instance.Id = id;
 
+        if (!GameManager.Instance.Players[id].gameObject.activeInHierarchy)
+            GameManager.Instance.Players[id].gameObject.SetActive(true);
+
         ClientSend.SendWelcomeReceived();
         Client.Instance.udp.Connect(((IPEndPoint)Client.Instance.tcp.socket.Client.LocalEndPoint).Port);
     }
@@ -33,24 +36,9 @@ public class ClientHandle
             Client.Instance.playerController.transform.position = new Vector3(position.x, 3, position.y);
         else
         {
-            bool hasPlayer = false;
-            int playerIndex = 0;
-            for (int i = 0; i < GameManager.Instance.Players.Count; i++)
-            {
-                if (GameManager.Instance.Players[i].Id == clientID)
-                {
-                    hasPlayer = true;
-                    playerIndex = i;
-                }
-            }
-
-            if (!hasPlayer)
-            {
-                GameManager.Instance.CreatePlayer(clientID);
-
-                playerIndex = GameManager.Instance.Players.Count - 1;
-            }
-            GameManager.Instance.Players[playerIndex].playerController.transform.position = new Vector3(position.x, 3, position.y);
+            if (!GameManager.Instance.Players[clientID].gameObject.activeInHierarchy)
+                GameManager.Instance.Players[clientID].gameObject.SetActive(true);
+            GameManager.Instance.Players[clientID].playerController.transform.position = new Vector3(position.x, 3, position.y);
         }
     }
 
@@ -58,12 +46,7 @@ public class ClientHandle
     {
         int clientID = packet.ReadInt();
 
-        for (int i = 0; i < GameManager.Instance.Players.Count; i++)
-        {
-            if (GameManager.Instance.Players[i].Id == clientID)
-            {
-                GameManager.Instance.DestroyPlayer(i);
-            }
-        }
+        if (GameManager.Instance.Players[clientID].gameObject.activeInHierarchy)
+            GameManager.Instance.Players[clientID].gameObject.SetActive(false);
     }
 }

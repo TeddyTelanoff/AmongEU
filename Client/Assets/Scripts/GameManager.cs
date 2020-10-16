@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public const int MaxPlayers = 10;
     public static GameManager Instance;
 
     private void Awake()
@@ -14,20 +15,23 @@ public class GameManager : MonoBehaviour
         else if (Instance != this)
         {
             Destroy(this);
+            return;
+        }
+
+        for (int i = 1; i <= MaxPlayers; i++)
+        {
+            Player player = CreatePlayer(i);
+            player.gameObject.SetActive(false);
         }
     }
 
-    public List<Player> Players = new List<Player>();
+    public Dictionary<int, Player> Players = new Dictionary<int, Player>();
     public GameObject playerPrefab;
 
-    public void CreatePlayer(int id)
+    public Player CreatePlayer(int id)
     {
         GameObject player = Instantiate(playerPrefab);
         player.GetComponent<Player>().Id = id;
-    }
-
-    public void DestroyPlayer(int index)
-    {
-        Destroy(Players[index].gameObject);
+        return player.GetComponent<Player>();
     }
 }
