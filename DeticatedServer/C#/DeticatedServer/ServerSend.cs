@@ -11,6 +11,13 @@ namespace DeticatedServer
             Server.Clients[clientID].tcp.SendPacket(packet);
         }
 
+        public static void SendTCPData(int[] clients, Packet packet)
+        {
+            packet.WriteLength();
+            foreach (int id in clients)
+                Server.Clients[id].tcp.SendPacket(packet);
+        }
+
         public static void SendTCPDataToAll(Packet packet)
         {
             packet.WriteLength();
@@ -51,6 +58,13 @@ namespace DeticatedServer
         {
             packet.WriteLength();
             Server.Clients[clientID].udp.SendPacket(packet);
+        }
+
+        public static void SendUDPData(int[] clients, Packet packet)
+        {
+            packet.WriteLength();
+            foreach (int id in clients)
+                Server.Clients[id].udp.SendPacket(packet);
         }
 
         public static void SendUDPDataToAll(Packet packet)
@@ -117,7 +131,7 @@ namespace DeticatedServer
             using (Packet packet = new Packet((int)ServerPackets.Position))
             {
                 packet.Write(clientID);
-                packet.Write(Server.Clients[clientID].playerController.position);
+                packet.Write(Server.Clients[clientID].player.playerController.polygonCollider.position);
 
                 SendUDPDataToAll(packet);
             }

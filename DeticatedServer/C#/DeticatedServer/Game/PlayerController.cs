@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Numerics;
 
 namespace DeticatedServer.Game
 {
-    class PlayerController : IDisposable
+    class PlayerController
     {
         public int clientID;
         public Vector2 position;
@@ -13,8 +12,9 @@ namespace DeticatedServer.Game
 
         public PolygonCollider polygonCollider;
 
-        public PlayerController(int id)
+        public PlayerController(ref Vector2 position, int id)
         {
+            this.position = position;
             clientID = id;
 
             Input = new Dictionary<int, int>();
@@ -23,16 +23,11 @@ namespace DeticatedServer.Game
 
             polygonCollider = new PolygonCollider(ref position, new Vector2[]
             {
-                new Vector2(-1, -1),
-                new Vector2( 1, -1),
-                new Vector2( 1,  1),
-                new Vector2(-1,  1)
+                new Vector2(-2.322897f, -2.586864f),
+                new Vector2( 2.322897f, -2.586864f),
+                new Vector2( 2.322897f,  2.586864f),
+                new Vector2(-2.322897f,  2.586864f)
             });
-        }
-
-        public void Dispose()
-        {
-            polygonCollider.Dispose();
         }
 
         public void Update()
@@ -48,10 +43,10 @@ namespace DeticatedServer.Game
             if (Input[(int)PlayerInput.Back] == (int)ButtonMode.Held)
                 direction -= Vector2.UnitY;
 
-            position += direction;
+            polygonCollider.position += direction;
 
             if (Server.Clients[clientID].tcp.socket == null)
-                position = new Vector2();
+                polygonCollider.position = Vector2.Zero;
             else
                 ServerSend.SendPosition(clientID);
         }

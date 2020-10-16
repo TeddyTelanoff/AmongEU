@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace DeticatedServer.Game
 {
-    class PolygonCollider : IDisposable
+    class PolygonCollider
     {
         public static List<PolygonCollider> polygonColliders = new List<PolygonCollider>();
 
@@ -21,66 +21,111 @@ namespace DeticatedServer.Game
             }
         }
 
+        public readonly bool isStatic;
+
         public readonly Vector2[] objectVertices;
 
         public PolygonCollider(ref Vector2 position, Vector2[] objectVertices)
         {
+            isStatic = false;
+
             this.position = position;
             this.objectVertices = new Vector2[objectVertices.Length];
             Array.Copy(objectVertices, this.objectVertices, objectVertices.Length);
 
-            polygonColliders.Add(this);
+            Enable();
         }
 
-        public void Dispose()
+        public PolygonCollider(Vector2 position, Vector2[] objectVertices)
         {
-            polygonColliders.Remove(this);
+            isStatic = true;
+
+            this.position = position;
+            this.objectVertices = new Vector2[objectVertices.Length];
+            Array.Copy(objectVertices, this.objectVertices, objectVertices.Length);
+
+            Enable();
+        }
+
+        public void Enable()
+        {
+            if (!polygonColliders.Contains(this))
+                polygonColliders.Add(this);
+        }
+
+        public void Disable()
+        {
+            if (polygonColliders.Contains(this))
+                polygonColliders.Remove(this);
         }
 
         public static void CheckCollisions()
         {
             for (int i = 0; i < polygonColliders.Count; i++)
             {
-                PolygonCollider poly1;
-                PolygonCollider poly2;
-                for (int shape = 0; shape < 2; shape++)
+                HandleCollision(i);
+            }
+        }
+
+        private static void HandleCollision(int i)
+        {
+            PolygonCollider poly1;
+            PolygonCollider poly2;
+
+            poly1 = polygonColliders[i];
+            poly2 = polygonColliders[(i + 1) % polygonColliders.Count];
+
+            float overlap = float.PositiveInfinity;
+
+            for (int shape = 0; shape < 2; shape++)
+            {
+                if (shape == 1)
                 {
-                    if (shape == 1)
-                    {
-                        poly1 = polygonColliders[(i + 1) % polygonColliders.Count];
-                        poly2 = polygonColliders[i];
-                    }
-                    else
-                    {
-                        poly1 = polygonColliders[i];
-                        poly2 = polygonColliders[(i + 1) % polygonColliders.Count];
-                    }
-
-                    for (int v = 0; v < poly1.vertices.Length; v++)
-                    {
-                        Vector2 s1 = poly1.position;
-                        Vector2 e1 = poly1.vertices[v];
-
-                        Vector2 displacement = new Vector2();
-
-                        for (int e = 0; e < poly2.vertices.Length; e++)
-                        {
-                            Vector2 s2 = poly2.vertices[e];
-                            Vector2 e2 = poly2.vertices[(e + 1) % poly2.vertices.Length];
-
-                            float h = (e2.X - s2.X) * (s1.Y - e2.Y) - (s1.X - e1.X) * (e2.Y - s2.Y);
-                            float t1 = ((s2.Y - e2.Y) * (s1.X - s2.X) + (e2.X - s2.X) * (s1.Y - s2.Y)) / h;
-                            float t2 = ((s1.Y - e1.Y) * (s1.X - s2.X) + (e1.X - s1.X) * (s1.Y - s2.Y)) / h;
-
-                            if (t1 >= 0 && t1 < 1 && t2 >= 0 && t2 < 1)
-                            {
-                                displacement += (1 - t1) * (e1 - s1);
-                            }
-                        }
-
-                        poly1.position += displacement * (shape == 0 ? -1 : +1);
-                    }
+                    poly1 = polygonColliders[(i + 1) % polygonColliders.Count];
+                    poly2 = polygonColliders[i];
                 }
+                else
+                {
+                    poly1 = polygonColliders[i];
+                    poly2 = polygonColliders[(i + 1) % polygonColliders.Count];
+                }
+
+                for (int a = 0; a < poly1.vertices.Length; a++)
+                {
+                    int b = (a + 1) % poly1.vertices.Length;
+                    Vector2 axisProj = new Vector2(-(poly1.vertices[b].Y - poly1.vertices[a].Y), poly1.vertices[b].X - poly1.vertices[a].X);
+
+                    float d = axisProj.Length();
+                    axisProj /= d;
+
+                    float min1 = float.NegativeInfinity, max1 = float.PositiveInfinity;
+                    for (int p = 0; p < poly1.vertices.Length; p++)
+                    {
+                        float q = (poly1.vertices[p].X * axisProj.X + poly1.vertices[p].Y * axisProj.Y);
+                        min1 = MathF.Min(min1, q);
+                        max1 = MathF.Max(max1, q);
+                    }
+
+                    float min2 = float.NegativeInfinity, max2 = float.PositiveInfinity;
+                    for (int p = 0; p < poly1.vertices.Length; p++)
+                    {
+                        float q = (poly2.vertices[p].X * axisProj.X + poly2.vertices[p].Y * axisProj.Y);
+                        min2 = MathF.Min(min2, q);
+                        max2 = MathF.Max(max2, q);
+                    }
+
+                    overlap = MathF.Min(MathF.Min(max1, max2) - MathF.Max(min1, min2), overlap);
+
+                    if (!(max2 >= min1 && max1 >= min2))
+                        return;
+                }
+            }
+
+            if (!poly1.isStatic)
+            {
+                Vector2 dir = poly2.position - poly1.position;
+                float s = dir.Length();
+                poly1.position -= overlap * dir / s;
             }
         }
     }

@@ -47,8 +47,7 @@ namespace DeticatedServer
                     return;
                 }
 
-                if (Server.Clients[clientID].playerController != null)
-                    Server.Clients[clientID].playerController.Input[key] = mode;
+                Server.Clients[clientID].player.playerController.Input[key] = mode;
             }
         }
     }

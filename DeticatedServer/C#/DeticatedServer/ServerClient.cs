@@ -13,7 +13,7 @@ namespace DeticatedServer
         public TCP tcp;
         public UDP udp;
 
-        public PlayerController playerController;
+        public Player player;
         public string username;
 
         public ServerClient(int id)
@@ -22,7 +22,7 @@ namespace DeticatedServer
             tcp = new TCP(Id);
             udp = new UDP(Id);
 
-            playerController = new PlayerController(Id);
+            player = new Player(Id);
             username = "";
         }
 
@@ -47,6 +47,8 @@ namespace DeticatedServer
                 this.socket.SendBufferSize = DataBufferSize;
 
                 stream = this.socket.GetStream();
+
+                Server.Clients[id].Connect();
 
                 receivedPacket = new Packet();
                 receiveBuffer = new byte[DataBufferSize];
@@ -197,8 +199,13 @@ namespace DeticatedServer
 
         public void Update()
         {
-            if (playerController != null)
-                playerController.Update();
+            if (tcp.socket != null)
+                player.Update();
+        }
+
+        public void Connect()
+        {
+            player.Enable();
         }
 
         public void Disconnect()
@@ -208,7 +215,7 @@ namespace DeticatedServer
             tcp.Disconnect();
             udp.Disconnect();
 
-            playerController.Dispose();
+            player.Disable();
 
             ServerSend.SendDisconnect(Id);
         }
